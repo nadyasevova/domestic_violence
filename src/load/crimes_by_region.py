@@ -15,8 +15,8 @@ def load_crimes_by_region() -> None:
     with engine.begin() as connection:
         connection.execute(
             text(
-                "TRUNCATE TABLE staging.crimes_by_region "
-                "RESTART IDENTITY"
+                "truncate table staging.crimes_by_region "
+                "restart identity"
             )
         )
 
@@ -31,7 +31,7 @@ def load_crimes_by_region() -> None:
         )
 
         loaded_rows = connection.execute(
-            text("SELECT COUNT(*) FROM staging.crimes_by_region")
+            text("select count(*) from staging.crimes_by_region")
         ).scalar_one()
 
         if loaded_rows != len(data):

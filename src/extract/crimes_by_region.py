@@ -4,34 +4,17 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.common.data_validation import parse_count
+from src.extract.common import get_reporting_month, find_header_row
+
+
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 SOURCE_FILENAME = "crimes_by_region.xls"
 
 PERIOD_PATTERN = re.compile(r"(\d{2})\.(\d{2})\.(\d{4})")
 
-
-def get_reporting_month(sheet_data: pd.DataFrame) -> date:
-    for value in sheet_data.iloc[:10, 0].dropna():
-        match = PERIOD_PATTERN.search(str(value))
-
-        if match:
-            _, month, year = map(int, match.groups())
-            return date(year, month, 1)
-
-    raise ValueError("Reporting period was not found in the sheet")
-
-
-def find_header_row(sheet_data: pd.DataFrame) -> int:
-    first_column = sheet_data.iloc[:, 0].astype(str).str.strip()
-    matching_rows = sheet_data.index[first_column == "РЕГИОН"].tolist()
-
-    if len(matching_rows) != 1:
-        raise ValueError(
-            f"Expected one REGION header, found {len(matching_rows)}"
-        )
-
-    return matching_rows[0]
 
 
 def extract_sheet(
@@ -46,7 +29,7 @@ def extract_sheet(
     )
 
     reporting_month = get_reporting_month(sheet_data)
-    header_row = find_header_row(sheet_data)
+    header_row = find_header_row(sheet_data, "РЕГИОН")
 
     crime_columns = []
 
@@ -73,7 +56,13 @@ def extract_sheet(
             continue
 
         for column_index, criminal_code_article in crime_columns:
-            registered_crimes = sheet_data.iat[row_index, column_index]
+            registered_crimes = parse_count(
+                value=sheet_data.iat[row_index, column_index],
+                source_file=source_file,
+                sheet_name=sheet_name,
+                row_number=row_index + 1,
+                column_number=column_index + 1,
+            )
 
             if pd.isna(registered_crimes):
                 raise ValueError(
@@ -99,18 +88,6 @@ def extract_sheet(
             )
 
     result = pd.DataFrame(records)
-
-    if len(crime_columns) != 9:
-        raise ValueError(
-            f"Expected 9 crime columns in {source_file}, "
-            f"sheet {sheet_name}, found {len(crime_columns)}"
-        )
-
-    if len(result) != 270:
-        raise ValueError(
-            f"Expected 270 rows in {source_file}, "
-            f"sheet {sheet_name}, found {len(result)}"
-        )
 
     return result
 
@@ -140,14 +117,6 @@ def extract_crimes_by_region() -> pd.DataFrame:
                 )
 
     result = pd.concat(extracted_sheets, ignore_index=True)
-
-    result = result.sort_values(
-        by=[
-            "reporting_month",
-            "police_region_raw",
-            "criminal_code_article_raw",
-        ]
-    ).reset_index(drop=True)
 
     return result
 
