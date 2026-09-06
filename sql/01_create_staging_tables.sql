@@ -75,7 +75,7 @@ create table if not exists staging.crimes_by_location (
     constraint chk_location_breakdown_type check (
             location_breakdown_type in (
                 'public_place',
-                'location_type'
+                'geographic_area'
             )
         ),
     constraint chk_crime_status check (

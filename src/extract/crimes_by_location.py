@@ -13,72 +13,72 @@ SOURCE_FILENAME = "crimes_by_location.xls"
 LOCATION_COLUMNS = {
     1: {
         "location_breakdown_type": "public_place",
-        "location_type_raw": "обществени места",
+        "location_type_raw": "Обществени места",
         "crime_status": "registered",
     },
     2: {
         "location_breakdown_type": "public_place",
-        "location_type_raw": "обществени места",
+        "location_type_raw": "Обществени места",
         "crime_status": "solved",
     },
     3: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "регионален център",
+        "location_type_raw": "Регионален център",
         "crime_status": "registered",
     },
     4: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "регионален център",
+        "location_type_raw": "Регионален център",
         "crime_status": "solved",
     },
     5: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "град",
+        "location_type_raw": "Град",
         "crime_status": "registered",
     },
     6: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "град",
+        "location_type_raw": "Град",
         "crime_status": "solved",
     },
     7: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "село",
+        "location_type_raw": "Село",
         "crime_status": "registered",
     },
     8: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "село",
+        "location_type_raw": "Село",
         "crime_status": "solved",
     },
     9: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "извън населено място",
+        "location_type_raw": "Извън населено място",
         "crime_status": "registered",
     },
     10: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "извън населено място",
+        "location_type_raw": "Извън населено място",
         "crime_status": "solved",
     },
     11: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "вилна зона",
+        "location_type_raw": "Вилна зона",
         "crime_status": "registered",
     },
     12: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "вилна зона",
+        "location_type_raw": "Вилна зона",
         "crime_status": "solved",
     },
     13: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "гранична зона",
+        "location_type_raw": "Гранична зона",
         "crime_status": "registered",
     },
     14: {
         "location_breakdown_type": "geographic_area",
-        "location_type_raw": "гранична зона",
+        "location_type_raw": "Гранична зона",
         "crime_status": "solved",
     },
     15: {

@@ -1,33 +1,50 @@
 create schema if not exists analytics;
 
 
-drop table if exists analytics.dim_crime_type cascade;
+drop table if exists analytics.dim_crime_type;
 create table if not exists analytics.dim_crime_type (
     crime_type_id smallint primary key,
     crime_type_name varchar(100) not null,
-    criminal_code_article varchar(100) not null,
+    criminal_code_article varchar(100),
+    crime_type_level varchar(20) not null,
     display_order smallint not null,
 
     constraint uq_crime_type_name unique (crime_type_name),
     constraint uq_criminal_code_article unique (criminal_code_article),
     constraint uq_crime_type_display_order unique (display_order),
-    constraint chk_crime_type_display_order_positive check (display_order > 0)
+    constraint chk_crime_type_display_order_positive check (display_order > 0),
+
+    constraint chk_crime_type_level
+        check (
+            crime_type_level in (
+                'total',
+                'detail'
+            )
+        ),
+    constraint chk_criminal_code_article_by_level
+    check (
+        (crime_type_level = 'total' and criminal_code_article is null)
+        or
+        (crime_type_level = 'detail' and criminal_code_article is not null)
+    )        
+
 );
 
 insert into analytics.dim_crime_type 
-    (crime_type_id, crime_type_name, criminal_code_article, display_order)
+    (crime_type_id, crime_type_name, criminal_code_article, crime_type_level, display_order)
 values
-    (1, 'Убийство', 'чл.116, ал.1, т.6а', 1),
-    (2, 'Телесна повреда', 'чл.131, ал.1, т.5а', 2),
-    (3, 'Отвличане', 'чл.142, ал.2, т.5а', 3),
-    (4, 'Лишаване от свобода', 'чл.142а, ал.4', 4),
-    (5, 'Принуда', 'чл.143, ал.3, т.1', 5),
-    (6, 'Закана', 'чл.144, ал.3, т.3', 6),
-    (7, 'Следене', 'чл.144а, ал.3', 7),
-    (8, 'Неизпълнение на заповед за защита', 'чл.296, ал.1', 8),
-    (9, 'Повторно неизпълнение на заповед за защита', 'чл.296, ал.4', 9);
+    (1, 'Общо престъпления', null, 'total', 1),
+    (2, 'Убийство', 'чл.116, ал.1, т.6а', 'detail', 2),
+    (3, 'Телесна повреда', 'чл.131, ал.1, т.5а', 'detail',3),
+    (4, 'Отвличане', 'чл.142, ал.2, т.5а', 'detail',4),
+    (5, 'Лишаване от свобода', 'чл.142а, ал.4', 'detail',5),
+    (6, 'Принуда', 'чл.143, ал.3, т.1', 'detail',6),
+    (7, 'Закана', 'чл.144, ал.3, т.3', 'detail',7),
+    (8, 'Следене', 'чл.144а, ал.3', 'detail',8),
+    (9, 'Неизпълнение на заповед за защита', 'чл.296, ал.1', 'detail', 9),
+    (10, 'Повторно неизпълнение на заповед за защита', 'чл.296, ал.4', 'detail', 10);
 
-drop table if exists analytics.dim_police_structure cascade;
+drop table if exists analytics.dim_police_structure;
 create table if not exists analytics.dim_police_structure (
     police_structure_id smallint primary key,
     police_structure_name varchar(100) not null,
@@ -87,7 +104,7 @@ values
     (30, 'СДВР', 'regional_directorate', 30);
 
     
-drop table if exists analytics.dim_offender_category cascade;
+drop table if exists analytics.dim_offender_category;
 create table if not exists analytics.dim_offender_category (
     offender_category_id smallint primary key,
     offender_category_name varchar(100) not null,
@@ -116,7 +133,7 @@ values
     (7, 'Над 40 години', 'age', 7);
 
 
-drop table if exists analytics.dim_location_category cascade;
+drop table if exists analytics.dim_location_category;
 create table analytics.dim_location_category (
     location_category_id smallint primary key,
     location_category_name varchar(100) not null,
@@ -154,7 +171,7 @@ values
     (8, 'ГКПП', 'geographic_area', 8);
 
 
-drop table if exists analytics.dim_crime_status cascade;
+drop table if exists analytics.dim_crime_status;
 create table analytics.dim_crime_status (
     crime_status_id smallint primary key,
     crime_status_code varchar(20) not null,
@@ -179,7 +196,7 @@ values
     (2, 'solved', 'Разкрити', 2);
 
 
-drop table if exists analytics.dim_date cascade;
+drop table if exists analytics.dim_date;
 create table analytics.dim_date (
     calendar_date date primary key,
     day_of_month smallint,
@@ -229,3 +246,28 @@ select
 from
 	cte_dates;
 
+
+
+drop table if exists analytics.crime_type_mapping;
+create table analytics.crime_type_mapping (
+    source_crime_type_raw varchar(100) primary key,
+    crime_type_id smallint not null,
+
+    foreign key (crime_type_id) references analytics.dim_crime_type (crime_type_id)
+);
+
+insert into analytics.crime_type_mapping (
+    source_crime_type_raw,
+    crime_type_id
+)
+values
+    ('Престъпления в усл. на дом. насилие', 1),
+    ('- убийство', 2),
+    ('- тел. повреда', 3),
+    ('- отвличане', 4),
+    ('- лишаване от свобода', 5),
+    ('- принуда', 6),
+    ('- закана', 7),
+    ('- следене', 8),
+    ('- неизп. защита', 9),
+    ('- повт. неизп. защита', 10);
