@@ -44,3 +44,23 @@ from
         
     inner join analytics.crime_type_mapping ctm on ctm.source_crime_type_raw = cl.crime_type_raw
     inner join analytics.dim_crime_status d_cs on cl.crime_status = d_cs.crime_status_code
+
+
+
+truncate table analytics.fct_established_offenders;
+insert into analytics.fct_established_offenders (
+	reporting_month,
+    crime_type_id,
+    offender_category_id,
+    established_offenders_count
+)
+select 
+    d_d.calendar_date,
+    ctm.crime_type_id,
+    d_oc.offender_category_id,
+    eo.offender_count
+from 
+	staging.established_offenders eo
+    inner join analytics.dim_date d_d on eo.reporting_month = d_d.calendar_date
+	inner join analytics.dim_offender_category d_oc on lower(eo.offender_category_raw) =  lower(d_oc.offender_category_name)
+	inner join analytics.crime_type_mapping ctm on ctm.source_crime_type_raw = eo.crime_type_raw    

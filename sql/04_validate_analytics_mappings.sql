@@ -19,7 +19,7 @@ from
 where
 	d_ct.crime_type_id is null
     or d_ps.police_structure_id is null
-    or d_d.calendar_date is null
+    or d_d.calendar_date is null;
 
 
 
@@ -53,4 +53,30 @@ where
 	or d_lc.location_category_id is null
     or d_cs.crime_status_id is null
     
-    or ctm.crime_type_id is null        
+    or ctm.crime_type_id is null;        
+
+
+select 
+    eo.reporting_month,
+    eo.crime_type_raw,
+	eo.offender_category_raw,
+    eo.offender_count,
+    
+   
+	d_d.calendar_date,
+    d_oc.offender_category_id,
+    d_oc.offender_category_name,
+
+	ctm.crime_type_id,
+    eo.offender_count
+    
+from 
+	staging.established_offenders eo
+    left join analytics.dim_date d_d on eo.reporting_month = d_d.calendar_date
+	left join analytics.dim_offender_category d_oc on lower(eo.offender_category_raw) =  lower(d_oc.offender_category_name)
+	left join analytics.crime_type_mapping ctm on ctm.source_crime_type_raw = eo.crime_type_raw
+where
+	d_d.calendar_date is null
+	or d_oc.offender_category_id is null
+	or ctm.crime_type_id is null;
+        

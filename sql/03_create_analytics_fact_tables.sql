@@ -38,3 +38,23 @@ create table analytics.fct_crimes_by_location (
     check (extract(day from reporting_month) = 1),
     check (crime_count >= 0)
 );
+
+
+drop table if exists analytics.fct_established_offenders;
+create table analytics.fct_established_offenders (
+
+    reporting_month date not null,
+    crime_type_id smallint not null,
+	offender_category_id smallint not null,
+
+    established_offenders_count smallint not null,
+
+    primary key (reporting_month, crime_type_id, offender_category_id),
+
+    foreign key (reporting_month) references analytics.dim_date (calendar_date),
+    foreign key (crime_type_id) references analytics.dim_crime_type (crime_type_id),
+    foreign key (offender_category_id) references analytics.dim_offender_category (offender_category_id),
+
+    check (extract(day from reporting_month) = 1),
+    check (established_offenders_count >= 0)
+);
