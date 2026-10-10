@@ -30,7 +30,7 @@ The objective of this project is to build a reproducible analytical workflow tha
 - extracts and standardizes the source files;
 - preserves the original published values;
 - loads the data into PostgreSQL staging tables;
-- validates totals, categories, and reporting periods;
+- performs SQL-based data quality checks on totals, categories, and reporting periods;
 - transforms the data into an analytical model;
 - presents the results through clear and responsible data visualizations.
 
@@ -49,7 +49,7 @@ The current dataset covers:
 The source reports contain information about:
 
 - registered crimes by police region;
-- registered crimes by location type;
+- registered crimes by settlement and location type;
 - established offenders by age group and gender.
 
 Source: [Bulgarian Ministry of Interior](https://www.mvr.bg/gdnp/%D0%B4%D0%B5%D0%B9%D0%BD%D0%BE%D1%81%D1%82%D0%B8/%D0%B4%D0%BE%D0%BC%D0%B0%D1%88%D0%BD%D0%BE-%D0%BD%D0%B0%D1%81%D0%B8%D0%BB%D0%B8%D0%B5/%D1%81%D1%82%D0%B0%D1%82%D0%B8%D1%81%D1%82%D0%B8%D0%BA%D0%B0/%D1%80%D0%B5%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B8%D1%80%D0%B0%D0%BD%D0%B8-%D0%BF%D1%80%D0%B5%D1%81%D1%82%D1%8A%D0%BF%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B4%D0%BE%D0%BC%D0%B0%D1%88%D0%BD%D0%BE-%D0%BD%D0%B0%D1%81%D0%B8%D0%BB%D0%B8%D0%B5)
@@ -62,16 +62,17 @@ No personal or case-level information is used in this project.
 flowchart LR
     A["Official XLS reports"] --> B["Python extraction"]
     B --> C["PostgreSQL staging"]
-    C --> D["Validation checks"]
+    C --> D["SQL validation (manual)"]
     D --> E["Analytical model"]
     E --> F["Power BI report"]
 ```
 
-The source files are preserved in their original form. Data cleaning and transformation are performed separately so that published values can always be traced back to their source.
+The original XLS files are preserved without modification. Data cleaning and transformation are performed separately from the raw data to support traceability and reproducibility.
+
 
 ## Data model
 
-The analytical model separates measurable events from descriptive dimensions.
+The analytical model separates aggregated statistical measures from descriptive dimensions.
 
 The main dimensions include:
 
@@ -85,19 +86,13 @@ Key dimensions use predefined IDs that remain consistent when new reporting peri
 
 ## Data validation
 
-The loading and transformation process includes checks for:
+## Data validation
 
-- duplicate source cells;
-- missing or unexpected values;
-- inconsistent crime classifications;
-- invalid reporting periods;
-- published totals versus calculated totals;
-- consistency between regional and national values;
-- changes in source-file structure.
+Data quality checks are currently performed manually using SQL queries to identify potential inconsistencies in the source data.
 
-Detected discrepancies are documented rather than silently corrected.
+Identified discrepancies are documented, while the original published values are preserved without modification.
 
-This distinction is important because the objective is to analyze the published data while preserving its original meaning and limitations.
+Automated tests have not yet been implemented.
 
 ## Regional analysis
 
@@ -107,12 +102,14 @@ Users can:
 
 - switch between reporting years;
 - select a region from the map or ranking chart;
-- compare regional totals;
+- compare the number of registered crimes across regions;
 - examine the distribution by crime type;
 - compare monthly trends for up to four selected regions;
 - view exact values through report tooltips.
 
 The map uses a consistent color scale across reporting years so that differences between years remain visually comparable.
+
+The monthly trend chart displays the full available reporting period, independently of the year selection applied to the upper section of the report.
 
 ## Initial findings
 
@@ -121,8 +118,6 @@ For 2024:
 - bodily injury was the most frequently registered crime type, accounting for 70.8% of the reported total;
 - non-compliance with a protection order was the second-largest category;
 - Burgas and Sofia-city recorded the highest regional totals;
-- a small number of crime types accounted for most registered crimes;
-- substantial differences were visible between police regions.
 
 These findings describe police-registered crimes and should not be interpreted as estimates of the actual prevalence of domestic violence.
 
@@ -133,17 +128,16 @@ These findings describe police-registered crimes and should not be interpreted a
 - Regional values are not currently normalized by population.
 - Data for 2026 covers only part of the year and should not be compared directly with complete annual totals.
 - The source reports provide aggregated statistics and do not support case-level analysis.
-- The analysis identifies patterns and associations but does not establish causal relationships.
+- The analysis is descriptive and does not establish causal relationships.
 
 ## Technologies
 
-- **Python and pandas** — extraction, cleaning, and transformation
-- **PostgreSQL** — staging, validation, and analytical storage
-- **SQL** — data quality checks and analytical queries
-- **Power BI and DAX** — data modelling, interaction design, and visualization
-- **Git and GitHub** — version control and project documentation
-- **uv** — Python environment and dependency management
-- **pytest and Ruff** — testing and code quality
+- Python and pandas — extraction, cleaning, and transformation
+- PostgreSQL — staging and analytical storage
+- SQL — data quality checks and analytical queries
+- Power BI and DAX — data modelling, interaction design, and visualization
+- Git and GitHub — version control and project documentation
+- uv — Python environment and dependency management
 
 ## Repository structure
 
@@ -153,14 +147,14 @@ These findings describe police-registered crimes and should not be interpreted a
 ├── data/
 │   └── raw/         # Original source files by reporting year
 ├── docs/            # Documentation and report images
-├── logs/            # Processing logs
-├── notebooks/       # Exploratory analysis
-├── output/          # Generated outputs
 ├── powerbi/         # Power BI report file
 ├── sql/             # Schema, validation, and analytical SQL
 ├── src/             # Python extraction and loading code
-└── tests/           # Automated tests
-```
+
+
+## Reproducing the analysis
+
+Step-by-step instructions for setting up the environment, loading the source data, building the analytical model, and refreshing the Power BI report will be added as the documentation is completed.```
 
 ## View the Power BI report
 
@@ -170,7 +164,7 @@ The current Power BI report can be downloaded here:
 
 Power BI Desktop is required to open the `.pbix` file.
 
-The report contains imported public data, so it can be explored without connecting to the original PostgreSQL database. Refreshing the data requires access to the project database and source files.
+The report contains imported public data, so it can be explored without connecting to the original PostgreSQL database. Refreshing the data requires access to the PostgreSQL database used by the project.
 
 ## Project status
 
@@ -180,7 +174,7 @@ The report contains imported public data, so it can be explored without connecti
 - extraction and loading of the three source datasets;
 - PostgreSQL staging tables;
 - analytical dimensions and fact tables;
-- data validation queries;
+- SQL data validation queries;
 - regional analysis Power BI page;
 - dynamic report context and interactive filtering.
 
@@ -188,7 +182,6 @@ The report contains imported public data, so it can be explored without connecti
 
 - crime location analysis;
 - offender age and gender analysis;
-- expanded automated tests;
 - final documentation;
 - additional analytical insights.
 
