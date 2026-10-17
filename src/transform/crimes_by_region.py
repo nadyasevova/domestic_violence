@@ -1,10 +1,7 @@
 from sqlalchemy import text
 from src.common.database import get_engine
 
-
 def transform_crimes_by_region(year: int) -> None:
-    print ("Transforming crimes by region data...")
-
     engine = get_engine()
 
     with engine.begin() as connection:

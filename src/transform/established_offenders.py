@@ -5,8 +5,6 @@ from src.common.database import get_engine
 
 
 def transform_established_offenders(year: int) -> None:
-    print ("Transforming established offenders data...")
-
     engine = get_engine()
 
     with engine.begin() as connection:

@@ -109,7 +109,6 @@ def extract_sheet(
 
 
 def extract_established_offenders(year: int) -> pd.DataFrame:
-
     source_file = RAW_DATA_DIR / str(year) / SOURCE_FILENAME
 
     if not source_file.exists():

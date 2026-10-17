@@ -1,3 +1,4 @@
+import logging
 from sqlalchemy import text
 
 from src.common.database import get_engine
@@ -7,8 +8,9 @@ SCHEMA_NAME = "staging"
 TABLE_NAME = "established_offenders"
 CHUNK_SIZE = 1000
 
-
+logger = logging.getLogger(__name__)
 def load_established_offenders(year: int) -> None:
+
     data = extract_established_offenders(year)
     engine = get_engine()
 
@@ -39,5 +41,5 @@ def load_established_offenders(year: int) -> None:
                 f"Expected {len(data)} rows, loaded {loaded_rows}"
             )
 
-    print(f"Rows loaded: {loaded_rows}")
-    print(f"Target table: {SCHEMA_NAME}.{TABLE_NAME}")
+    logger.info(f"Rows loaded: {loaded_rows}")
+    logger.info(f"Target table: {SCHEMA_NAME}.{TABLE_NAME}")

@@ -1,5 +1,9 @@
 import argparse
+import logging
+
 from pathlib import Path
+
+from src.common.logging_config import init_logging
 
 from src.load.crimes_by_region import load_crimes_by_region
 from src.load.crimes_by_location import load_crimes_by_location
@@ -10,8 +14,16 @@ from src.transform.crimes_by_location import transform_crimes_by_location
 from src.transform.established_offenders import transform_established_offenders
 
 RAW_DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "raw"
+LOGGING_DIR = Path(__file__).resolve().parents[1] / "logs"
+
 
 def main() -> None:
+    
+    logger = logging.getLogger(__name__)
+    init_logging()
+
+    logger.info("Starting data extraction and transformation pipeline.")
+
     parser = argparse.ArgumentParser(description="Extract data from established offenders Excel file.")
 
     parser.add_argument(
@@ -34,6 +46,8 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    
+    logger.info(f"Arguments: {args}")
 
     if args.year is None:
         years = []
@@ -44,9 +58,8 @@ def main() -> None:
                 years.append(int(source_file.parent.name))
 
         if not years:
-            parser.error(
-                f"No source files found for {args.dataset}."
-            )
+            message = f"No source files found for {args.dataset}."
+            parser.error(message)
 
         years.sort()
     else:
@@ -57,7 +70,9 @@ def main() -> None:
         )
 
         if not source_file.is_file():
-            parser.error(f"Source file not found: {source_file}")
+            message = f"Source file not found: {source_file}"
+            logger.error(message)
+            parser.error(message)
 
         years = [args.year]
 
@@ -69,10 +84,39 @@ def main() -> None:
     }
 
     load_data, transform_data = dataset_steps[args.dataset]
-    for year in years:
-        print(f"Processing year: {year}")
-        load_data(year=year)
-        transform_data(year=year)
+
+    logger.info(
+        "Processing started: dataset=%s",
+        args.dataset
+    )
+
+    try:
+        for year in years:
+            logger.info("Year=%s",year)
+            
+            logger.info("Loading data started")
+            load_data(year=year)
+            logger.info("Loading data completed")
+
+
+            logger.info("Transforming data started")
+            transform_data(year=year)
+            logger.info("Transforming data completed")
+
+    except Exception:
+        logger.exception(
+            "Processing failed: dataset=%s year=%s",
+            args.dataset,
+            year,
+        )
+        raise
+    else:
+        logger.info(
+            "Processing completed successfully: dataset=%s years=%s",
+            args.dataset,
+            years,
+        )
+
 
 if __name__ == "__main__":
     main()

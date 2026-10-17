@@ -3,8 +3,6 @@ from src.common.database import get_engine
 
 
 def transform_crimes_by_location(year: int) -> None:
-    print ("Transforming crimes by location data...")
-
     engine = get_engine()
 
     with engine.begin() as connection:
