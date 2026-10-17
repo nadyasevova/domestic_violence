@@ -159,29 +159,25 @@ def extract_sheet(
     return result
 
 
-def extract_crimes_by_location() -> pd.DataFrame:
-    source_files = sorted(
-        RAW_DATA_DIR.glob(f"*/{SOURCE_FILENAME}")
-    )
+def extract_crimes_by_location(year: int) -> pd.DataFrame:
+    source_file = RAW_DATA_DIR / str(year) / SOURCE_FILENAME
 
-    if len(source_files) != 3:
+    if not source_file.exists():
         raise FileNotFoundError(
-            f"Expected 3 files named {SOURCE_FILENAME}, "
-            f"found {len(source_files)}"
+            f"Expected file {source_file} does not exist"
         )
 
     extracted_sheets = []
 
-    for source_file in source_files:
-        with pd.ExcelFile(source_file, engine="xlrd") as workbook:
-            for sheet_name in workbook.sheet_names:
-                extracted_sheets.append(
-                    extract_sheet(
-                        workbook=workbook,
-                        sheet_name=sheet_name,
-                        source_file=source_file,
-                    )
+    with pd.ExcelFile(source_file, engine="xlrd") as workbook:
+        for sheet_name in workbook.sheet_names:
+            extracted_sheets.append(
+                extract_sheet(
+                    workbook=workbook,
+                    sheet_name=sheet_name,
+                    source_file=source_file,
                 )
+            )
 
     result = pd.concat(
         extracted_sheets,
@@ -189,25 +185,3 @@ def extract_crimes_by_location() -> pd.DataFrame:
     )
 
     return result
-
-
-def main() -> None:
-    data = extract_crimes_by_location()
-
-    print(f"Rows extracted: {len(data)}")
-    print(
-        "Reporting months: "
-        f"{data['reporting_month'].nunique()}"
-    )
-    print(
-        "Source files: "
-        f"{data['source_file'].nunique()}"
-    )
-    print(
-        "Rows per month: "
-        f"{data.groupby('reporting_month').size().unique().tolist()}"
-    )
-
-
-if __name__ == "__main__":
-    main()

@@ -8,8 +8,8 @@ TABLE_NAME = "established_offenders"
 CHUNK_SIZE = 1000
 
 
-def load_established_offenders() -> None:
-    data = extract_established_offenders()
+def load_established_offenders(year: int) -> None:
+    data = extract_established_offenders(year)
     engine = get_engine()
 
     with engine.begin() as connection:
@@ -41,11 +41,3 @@ def load_established_offenders() -> None:
 
     print(f"Rows loaded: {loaded_rows}")
     print(f"Target table: {SCHEMA_NAME}.{TABLE_NAME}")
-
-
-def main() -> None:
-    load_established_offenders()
-
-
-if __name__ == "__main__":
-    main()

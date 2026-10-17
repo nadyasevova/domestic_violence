@@ -38,14 +38,11 @@ select
 	ctm.crime_type_id,
     d_cs.crime_status_id,
     cl.crime_count
-    
-    
 from 
 	staging.crimes_by_location cl
     left join analytics.dim_date d_d on cl.reporting_month = d_d.calendar_date
 	left join analytics.dim_location_category d_lc on cl.location_type_raw = d_lc.location_category_name
-    		and cl.location_breakdown_type = d_lc.classification_type
-        
+    		and cl.location_breakdown_type = d_lc.classification_type        
     left join analytics.crime_type_mapping ctm on ctm.source_crime_type_raw = cl.crime_type_raw
     left join analytics.dim_crime_status d_cs on cl.crime_status = d_cs.crime_status_code
 where

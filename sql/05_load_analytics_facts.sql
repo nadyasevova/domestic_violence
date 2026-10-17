@@ -4,13 +4,15 @@ insert into analytics.fct_crimes_by_region
 	reporting_month,
     police_structure_id,
     crime_type_id,
-    registered_crimes_count
+    registered_crimes_count,
+    datetime_created
 )    
 select 
     d_d.calendar_date,
     d_ps.police_structure_id,
     d_ct.crime_type_id,
-    cr.registered_crimes    
+    cr.registered_crimes,
+    now()    
 from 
 	staging.crimes_by_region cr
     inner join analytics.dim_crime_type d_ct on cr.criminal_code_article_raw = d_ct.criminal_code_article
@@ -27,14 +29,16 @@ insert into analytics.fct_crimes_by_location
     crime_type_id,
 	location_category_id,
 	crime_status_id,
-    crime_count
+    crime_count,
+    datetime_created
 )
 select 
 	d_d.calendar_date,
 	ctm.crime_type_id,
     d_lc.location_category_id,
     d_cs.crime_status_id,
-    cl.crime_count
+    cl.crime_count,
+    now()
     
 from 
 	staging.crimes_by_location cl

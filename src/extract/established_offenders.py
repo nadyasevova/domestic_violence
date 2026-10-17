@@ -12,7 +12,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 SOURCE_FILENAME = "established_offenders.xls"
 
-PERIOD_PATTERN = re.compile(r"(\d{2})\.(\d{2})\.(\d{4})")
 
 OFFENDER_CATEGORIES = {
     1: {
@@ -109,42 +108,26 @@ def extract_sheet(
     return result
 
 
-def extract_established_offenders() -> pd.DataFrame:
-    source_files = sorted(
-        RAW_DATA_DIR.glob(f"*/{SOURCE_FILENAME}")
-    )
+def extract_established_offenders(year: int) -> pd.DataFrame:
 
-    if len(source_files) != 3:
+    source_file = RAW_DATA_DIR / str(year) / SOURCE_FILENAME
+
+    if not source_file.exists():
         raise FileNotFoundError(
-            f"Expected 3 files named {SOURCE_FILENAME}, "
-            f"found {len(source_files)}"
+            f"Expected file {source_file} does not exist"
         )
 
     extracted_sheets = []
-
-    for source_file in source_files:
-        with pd.ExcelFile(source_file, engine="xlrd") as workbook:
-            for sheet_name in workbook.sheet_names:
-                extracted_sheets.append(
-                    extract_sheet(
-                        workbook=workbook,
-                        sheet_name=sheet_name,
-                        source_file=source_file,
-                    )
+    with pd.ExcelFile(source_file, engine="xlrd") as workbook:
+        for sheet_name in workbook.sheet_names:
+            extracted_sheets.append(
+                extract_sheet(
+                    workbook=workbook,
+                    sheet_name=sheet_name,
+                    source_file=source_file,
                 )
+            )
 
     result = pd.concat(extracted_sheets, ignore_index=True)
 
     return result
-
-
-def main() -> None:
-    data = extract_established_offenders()
-
-    print(f"Rows extracted: {len(data)}")
-    print(f"Reporting months: {data['reporting_month'].nunique()}")
-    print(f"Source files: {data['source_file'].nunique()}")
-
-
-if __name__ == "__main__":
-    main()

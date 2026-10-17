@@ -5,6 +5,7 @@ create table analytics.fct_crimes_by_region (
     police_structure_id smallint not null,
     crime_type_id smallint not null,
     registered_crimes_count smallint not null,
+    datetime_created timestamp not null default now(),
 
     primary key (reporting_month, police_structure_id, crime_type_id),
 
@@ -27,6 +28,7 @@ create table analytics.fct_crimes_by_location (
 	crime_status_id smallint not null,
     
     crime_count smallint not null,
+    datetime_created timestamp not null default now(),
 
     primary key (reporting_month, crime_type_id, location_category_id, crime_status_id),
 
@@ -48,6 +50,7 @@ create table analytics.fct_established_offenders (
 	offender_category_id smallint not null,
 
     established_offenders_count smallint not null,
+    datetime_created timestamp not null default now(),
 
     primary key (reporting_month, crime_type_id, offender_category_id),
 

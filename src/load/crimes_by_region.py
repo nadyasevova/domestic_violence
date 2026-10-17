@@ -8,8 +8,8 @@ TABLE_NAME = "crimes_by_region"
 CHUNK_SIZE = 1000
 
 
-def load_crimes_by_region() -> None:
-    data = extract_crimes_by_region()
+def load_crimes_by_region(year: int) -> None:
+    data = extract_crimes_by_region(year=year)
     engine = get_engine()
 
     with engine.begin() as connection:
@@ -41,11 +41,3 @@ def load_crimes_by_region() -> None:
 
     print(f"Rows loaded: {loaded_rows}")
     print(f"Target table: {SCHEMA_NAME}.{TABLE_NAME}")
-
-
-def main() -> None:
-    load_crimes_by_region()
-
-
-if __name__ == "__main__":
-    main()
