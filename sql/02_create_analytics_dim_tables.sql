@@ -44,17 +44,63 @@ values
     (9, 'Неизпълнение на заповед за защита', 'чл.296, ал.1', 'detail', 9),
     (10, 'Повторно неизпълнение на заповед за защита', 'чл.296, ал.4', 'detail', 10);
 
+
+drop table if exists analytics.dim_district;
+create table analytics.dim_district (
+    district_id smallint primary key,
+    district_name varchar(50) not null unique,
+    map_district_code varchar(3) not null unique,
+
+    constraint chk_district_id_positive
+        check (district_id > 0)
+);
+
+
+insert into analytics.dim_district (
+    district_id,
+    district_name,
+    district_code
+)
+values
+    (1, 'Благоевград', 'BLG'),
+    (2, 'Бургас', 'BGS'),
+    (3, 'Варна', 'VAR'),
+    (4, 'Велико Търново', 'VTR'),
+    (5, 'Видин', 'VID'),
+    (6, 'Враца', 'VRC'),
+    (7, 'Габрово', 'GAB'),
+    (8, 'Добрич', 'DOB'),
+    (9, 'Кърджали', 'KRZ'),
+    (10, 'Кюстендил', 'KNL'),
+    (11, 'Ловеч', 'LVE'),
+    (12, 'Монтана', 'MON'),
+    (13, 'Пазарджик', 'PAZ'),
+    (14, 'Перник', 'PER'),
+    (15, 'Плевен', 'PVN'),
+    (16, 'Пловдив', 'POV'),
+    (17, 'Разград', 'RAZ'),
+    (18, 'Русе', 'RSE'),
+    (19, 'Силистра', 'SLS'),
+    (20, 'Сливен', 'SLV'),
+    (21, 'Смолян', 'SML'),
+    (22, 'София-област', 'SFO'),
+    (23, 'Стара Загора', 'SZR'),
+    (24, 'Търговище', 'TGV'),
+    (25, 'Хасково', 'HKV'),
+    (26, 'Шумен', 'SHU'),
+    (27, 'Ямбол', 'JAM'),
+    (28, 'София-град', 'SOF');
+
 drop table if exists analytics.dim_police_structure;
 create table if not exists analytics.dim_police_structure (
     police_structure_id smallint primary key,
     police_structure_name varchar(100) not null,
     police_structure_type varchar(30) not null,
-    district_name varchar(50),
-    district_code varchar(3),
+    district_id smallint,
     display_order smallint not null,
 
+    foreign key (district_id) references analytics.dim_district (district_id),
     constraint uq_police_structure_display_order unique (display_order),
-
     constraint chk_police_structure_type
         check (
             police_structure_type in (

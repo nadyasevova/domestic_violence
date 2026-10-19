@@ -61,3 +61,25 @@ create table analytics.fct_established_offenders (
     check (extract(day from reporting_month) = 1),
     check (established_offenders_count >= 0)
 );
+
+
+drop table if exists analytics.fct_population_by_district;
+create table analytics.fct_population_by_district (
+
+    population_date date not null,
+    district_id smallint not null,
+	population_total integer not null,
+	population_men integer not null,
+	population_women integer not null,
+
+    primary key (population_date, district_id),
+
+    foreign key (poulation_date) references analytics.dim_date (calendar_date),
+    foreign key (district_id) references analytics.dim_district (district_id),
+
+    check (extract(day from population_total) = 1),
+    check (population_count >= 0),
+    check (population_men >= 0),
+    check (population_women >= 0),
+    check (population_total = population_men + population_women)
+);
