@@ -3,6 +3,7 @@ import logging
 
 from pathlib import Path
 
+from src.common.database import get_engine
 from src.common.logging_config import init_logging
 
 from src.load.crimes_by_region import load_crimes_by_region
@@ -90,18 +91,21 @@ def main() -> None:
         args.dataset
     )
 
+    engine = get_engine()
     try:
         for year in years:
-            logger.info("Year=%s",year)
-            
-            logger.info("Loading data started")
-            load_data(year=year)
-            logger.info("Loading data completed")
+
+            with engine.begin() as connection:
+                logger.info("Year=%s",year)
+                
+                logger.info("Loading data started")
+                load_data(year=year, connection=connection)
+                logger.info("Loading data completed")
 
 
-            logger.info("Transforming data started")
-            transform_data(year=year)
-            logger.info("Transforming data completed")
+                logger.info("Transforming data started")
+                transform_data(year=year, connection=connection)
+                logger.info("Transforming data completed")
 
     except Exception:
         logger.exception(
