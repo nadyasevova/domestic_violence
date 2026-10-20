@@ -59,3 +59,7 @@ def transform_established_offenders(year: int, connection: Connection) -> None:
         """
         )
     )
+
+
+    # print(f"Rows loaded: {invalid_rows_count}")
+    # print(f"Target table: {SCHEMA_NAME}.{TABLE_NAME}")

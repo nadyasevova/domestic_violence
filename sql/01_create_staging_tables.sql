@@ -1,5 +1,6 @@
 create schema if not exists staging;
 
+drop table if exists staging.population_by_district cascade;
 drop table if exists staging.crimes_by_location cascade;
 drop table if exists staging.crimes_by_region cascade;
 drop table if exists staging.established_offenders cascade;
@@ -90,4 +91,24 @@ create table if not exists staging.crimes_by_location (
             source_row_number > 0
             and source_column_number > 0
         )
+);
+
+
+create table if not exists staging.population_by_district (
+    population_date date not null,
+    district_name_raw varchar(100) not null,
+
+    population_total integer not null,
+    population_men integer not null,
+    population_women integer not null,
+
+    source_file text not null,
+    source_sheet varchar(30) not null,
+    source_row_number integer not null,
+
+    primary key (population_date, district_name_raw),
+
+    check (population_total >= 0),
+    check (population_men >= 0),
+    check (population_women >= 0)
 );

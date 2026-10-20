@@ -14,11 +14,9 @@ def load_established_offenders(year: int, connection: Connection) -> None:
     data = extract_established_offenders(year)
 
     connection.execute(
-        text(
-            "truncate table staging.established_offenders "
-            "restart identity"
+            text("delete from staging.established_offenders where extract(year from reporting_date) = :year"),
+            {"year": year}
         )
-    )
 
     data.to_sql(
         name=TABLE_NAME,
@@ -31,7 +29,8 @@ def load_established_offenders(year: int, connection: Connection) -> None:
     )
 
     loaded_rows = connection.execute(
-        text("select count(*) from staging.established_offenders")
+        text("select count(*) from staging.established_offenders where extract(year from reporting_date) = :year"),
+        {"year": year}  
     ).scalar_one()
 
     if loaded_rows != len(data):

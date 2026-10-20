@@ -13,12 +13,10 @@ def load_crimes_by_region(year: int, connection: Connection) -> None:
     data = extract_crimes_by_region(year=year)
 
     connection.execute(
-            text(
-                "truncate table staging.crimes_by_region "
-                "restart identity"
-            )
+            text("delete from staging.crimes_by_region where extract(year from reporting_month) = :year"),
+            {"year": year}
         )
-
+                
     data.to_sql(
         name=TABLE_NAME,
         schema=SCHEMA_NAME,
@@ -30,7 +28,8 @@ def load_crimes_by_region(year: int, connection: Connection) -> None:
     )
 
     loaded_rows = connection.execute(
-        text("select count(*) from staging.crimes_by_region")
+        text("select count(*) from staging.crimes_by_region where extract(year from reporting_month) = :year"),
+        {"year": year}
     ).scalar_one()
 
     if loaded_rows != len(data):
