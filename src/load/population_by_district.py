@@ -4,6 +4,7 @@ from sqlalchemy import text
 from src.common.logging_config import init_logging
 from src.common.database import get_engine
 from src.extract.population_by_district import extract_population_by_district
+from src.transform.population_by_district import transform_population_by_district
 
 SCHEMA_NAME = "staging"
 TABLE_NAME = "population_by_district"
@@ -50,4 +51,8 @@ def load_population_by_district(year: int, connection: Connection) -> None:
 
 engine = get_engine()
 with engine.begin() as connection:
-    load_population_by_district(2024, connection)
+    load_population_by_district(2025, connection)
+
+    logger.info(f"Start transforming population by district for year 2025")
+    transform_population_by_district(2025, connection)
+    logger.info(f"End transforming population by district for year 2025")

@@ -98,7 +98,7 @@ create table if not exists staging.population_by_district (
     population_date date not null,
     district_name_raw varchar(100) not null,
 
-    population_total integer not null,
+    population_total_count integer not null,
     population_men integer not null,
     population_women integer not null,
 
@@ -108,7 +108,7 @@ create table if not exists staging.population_by_district (
 
     primary key (population_date, district_name_raw),
 
-    check (population_total >= 0),
+    check (population_total_count >= 0),
     check (population_men >= 0),
     check (population_women >= 0)
 );

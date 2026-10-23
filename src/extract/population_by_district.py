@@ -61,7 +61,7 @@ def extract_population_by_district(
             records.append({
                 "population_date": date(year, 12, 31),
                 "district_name_raw": district_name,
-                "population_total": counts[0],
+                "population_total_count": counts[0],
                 "population_men": counts[1],
                 "population_women": counts[2],
                 "source_file": SOURCE_FILENAME.name,
